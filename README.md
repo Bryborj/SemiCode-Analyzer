@@ -15,16 +15,23 @@
 3. Finalmente, realizara la combinación de los dos elementos y determinará si se produce un material aislante (intrínseco), tipo P, tipo N o ninguno de los anteriores.
 
 **Opcional:**
+
 4. Representar los diagramas de los átomos y sus enlaces como material N y P, mostrando los huecos o electrones libres.
+
 5. Representar diagramas de energía (Bandas de valencia y de conducción).
 
 ### Información del creador:
 
 Alumno: [Bryan A. Borges](github.com/Bryborj "GitHub")
+
 Profesor: Daniel Sánchez Treviño
+
 Instituto: [Benemérita Universidad Autónoma de Puebla - BUAP](buap.mx "BUAP")
+
 Grado: Ingeniería en Ciencias de la Computación
+
 Materia: Circuitos Electrónicos
+
 JSON de tabla periódica: [Browserinator](https://github.com/Bowserinator/Periodic-Table-JSON/tree/master "Periodic Table JSON")
 
 ### Pasos para la ejecución en local:
