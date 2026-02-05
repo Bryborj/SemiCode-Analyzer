@@ -1,0 +1,14 @@
+---
+interface Props {
+    id: string;
+}
+
+const { id } = Astro.props;
+---
+
+<div
+    id={id}
+    class="flex flex-col items-center p-4 bg-white rounded-xl shadow-md min-h-[300px] justify-center"
+>
+    <p class="text-slate-400 italic">Esperando cálculo...</p>
+</div>

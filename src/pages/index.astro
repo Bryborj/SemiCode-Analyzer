@@ -1,0 +1,186 @@
+---
+import Layout from "../layouts/Layout.astro";
+import AtomViewer from "../components/AtomViewer.astro";
+---
+
+<Layout>
+  <main class="max-w-6xl mx-auto p-6 bg-slate-50 min-h-screen">
+    <header class="text-center mb-10">
+      <h1 class="text-4xl font-bold text-indigo-900">SemiCode Project</h1>
+      <p class="text-slate-600">
+        Analizador de Semiconductores y Configuración Electrónica
+      </p>
+    </header>
+
+    <div class="grid md:grid-cols-2 gap-6 bg-white p-8 rounded-2xl shadow-xl">
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700"
+            >Número Atómico Elemento A (Host)</label
+          >
+          <input
+            type="number"
+            id="z1"
+            class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+            placeholder="Ej. 14 (Si)"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700"
+            >Número Atómico Elemento B (Dopante)</label
+          >
+          <input
+            type="number"
+            id="z2"
+            class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+            placeholder="Ej. 13 (Al)"
+          />
+        </div>
+        <button
+          id="btnCalcular"
+          class="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition"
+        >
+          Calcular Material
+        </button>
+      </div>
+
+      <div id="resultado" class="hidden border-l pl-6 border-slate-200">
+        <h3 class="text-xl font-bold text-slate-800 mb-4">Resultado:</h3>
+        <div
+          id="materialResult"
+          class="text-2xl font-black text-indigo-600 mb-4 italic"
+        >
+        </div>
+        <div class="text-sm text-slate-600 space-y-2" id="detalles"></div>
+      </div>
+    </div>
+
+    <section id="visualSection" class="mt-10 hidden space-y-8">
+      <div class="grid md:grid-cols-2 gap-8">
+        <AtomViewer id="atomA" />
+        <AtomViewer id="atomB" />
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="bg-white p-6 rounded-xl shadow-md">
+          <h4 class="font-bold mb-4 text-center text-slate-800">
+            Diagrama de Energía
+          </h4>
+          <div class="border rounded-xl bg-slate-900 text-white p-6">
+            <h5
+              class="text-xs font-mono mb-4 text-slate-400 uppercase tracking-widest text-center"
+            >
+              Niveles de Energía
+            </h5>
+            <div
+              class="relative h-64 w-full flex flex-col justify-between items-center py-4"
+            >
+              <div
+                class="w-3/4 h-12 bg-blue-500/20 border-b-2 border-blue-400 flex items-center justify-center"
+              >
+                <span class="text-[10px] text-blue-300"
+                  >Banda de Conducción (E_c)</span
+                >
+              </div>
+
+              <div
+                id="fermiLine"
+                class="w-full border-t border-dashed border-yellow-400 absolute top-1/2 transition-all duration-500"
+              >
+                <span class="text-[8px] bg-slate-900 px-1 text-yellow-400 ml-2"
+                  >Nivel de Fermi (E_f)</span
+                >
+              </div>
+
+              <div
+                class="w-3/4 h-12 bg-orange-500/20 border-t-2 border-orange-400 flex items-center justify-center"
+              >
+                <span class="text-[10px] text-orange-300"
+                  >Banda de Valencia (E_v)</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-md flex flex-col">
+          <div
+            id="latticeVisual"
+            class="flex-grow flex flex-col items-center justify-center"
+          >
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<script>
+  import { getElementData, determineMaterial } from "../utils/chemistry.js";
+  import { renderAtom, renderLattice } from "../utils/visualizers.js";
+
+  let periodicTable = [];
+
+  fetch("/periodicTable.json")
+    .then((res) => res.json())
+    .then((data) => {
+      periodicTable = data.elements;
+      console.log(
+        "Tabla periódica cargada:",
+        periodicTable.length,
+        "elementos",
+      );
+    })
+    .catch((err) => console.error("Error cargando tabla periódica:", err));
+
+  const btn = document.getElementById("btnCalcular");
+
+  btn.addEventListener("click", () => {
+    const z1Input = document.getElementById("z1") as HTMLInputElement;
+    const z2Input = document.getElementById("z2") as HTMLInputElement;
+    const z1 = parseInt(z1Input.value);
+    const z2 = parseInt(z2Input.value);
+    const fermiLine = document.getElementById("fermiLine");
+
+    if (!z1 || !z2) return alert("Ingresa ambos números atómicos");
+
+    const el1 = getElementData(z1);
+    const el2 = getElementData(z2);
+    const material = determineMaterial(el1, el2);
+
+    const name1 =
+      periodicTable.find((el) => el.number === z1)?.name || "Desconocido";
+    const symbol1 = periodicTable.find((el) => el.number === z1)?.symbol || "X";
+
+    const name2 =
+      periodicTable.find((el) => el.number === z2)?.name || "Desconocido";
+    const symbol2 = periodicTable.find((el) => el.number === z2)?.symbol || "Y";
+
+    document.getElementById("resultado").classList.remove("hidden");
+    document.getElementById("materialResult").innerText = material;
+    document.getElementById("detalles").innerHTML = `
+            <p><strong>${name1} (${symbol1}):</strong> ${el1.configString} <span class="text-indigo-600 font-bold">(${el1.valenceElectrons} e- valencia)</span></p>
+            <p><strong>${name2} (${symbol2}):</strong> ${el2.configString} <span class="text-indigo-600 font-bold">(${el2.valenceElectrons} e- valencia)</span></p>
+    `;
+
+    document.getElementById("visualSection").classList.remove("hidden");
+
+    renderAtom("atomA", z1, symbol1);
+    renderAtom("atomB", z2, symbol2);
+
+    if (material.includes("Tipo N")) {
+      fermiLine.style.top = "25%";
+      fermiLine.querySelector("span").innerText =
+        "Nivel de Fermi (E_f) - Cerca de E_c";
+    } else if (material.includes("Tipo P")) {
+      fermiLine.style.top = "75%";
+      fermiLine.querySelector("span").innerText =
+        "Nivel de Fermi (E_f) - Cerca de E_v";
+    } else {
+      fermiLine.style.top = "50%";
+      fermiLine.querySelector("span").innerText =
+        "Nivel de Fermi (E_f) - Intrínseco";
+    }
+
+    renderLattice("latticeVisual", z1, z2, material);
+  });
+</script>

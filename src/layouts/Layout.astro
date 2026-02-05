@@ -1,0 +1,44 @@
+---
+import "../styles/global.css";
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/atomicon.png" />
+		<link rel="icon" href="/atomicon.png" />
+		<meta name="generator" content={Astro.generator} />
+		<title>SemiCode Analyzer</title>
+	</head>
+	<body>
+		<slot />
+		<footer
+			class="py-8 text-center text-slate-500 text-sm bg-slate-50 border-t border-slate-200 mt-auto"
+		>
+			<p>
+				&copy; {new Date().getFullYear()} SemiCode Analyzer. Desarrollado
+				por <a
+					href="https://github.com/Bryborj"
+					target="_blank"
+					class="font-medium text-indigo-600 hover:text-indigo-800 transition"
+					>Bryan A. Borges</a
+				>.
+			</p>
+			<p class="text-xs mt-2 text-slate-400">
+				Benemérita Universidad Autónoma de Puebla (BUAP) - Circuitos
+				Electrónicos
+			</p>
+		</footer>
+	</body>
+</html>
+
+<style>
+	html,
+	body {
+		margin: 0;
+		width: 100%;
+		height: 100%;
+	}
+</style>
